@@ -1,0 +1,47 @@
+package components
+
+import "kannonfoundry/api-go/auth"
+
+templ Login(err bool) {
+	<div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+		<div class="card shadow-lg" style="width: 100%; max-width: 400px;">
+			<div class="card-body p-4">
+				<h2 class="card-title text-center mb-4">Login</h2>
+				<form action="/login" method="POST">
+					<div class="mb-3">
+						<label class="form-label" for="username">Username</label>
+						<input class="form-control" type="text" id="username" name="username" required/>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="password">Password</label>
+						<input class="form-control" type="password" id="password" name="password" required/>
+					</div>
+					if err {
+						<div class="alert alert-danger" role="alert">
+							Invalid username or password
+						</div>
+					}
+					<div class="d-grid">
+						<button class="btn btn-primary btn-lg" type="submit">Login</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+}
+
+templ Logout(name auth.User) {
+	<div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+		<div class="card shadow-lg" style="width: 100%; max-width: 400px;">
+			<div class="card-body p-4 text-center">
+				<h2 class="card-title mb-3">Logout</h2>
+				<p class="mb-4">Logged in as <strong>{ name.Username }</strong></p>
+				<form action="/logout" method="POST">
+					<div class="d-grid">
+						<button class="btn btn-outline-danger btn-lg" type="submit">Logout</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+}

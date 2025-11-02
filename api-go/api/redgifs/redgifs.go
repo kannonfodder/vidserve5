@@ -77,8 +77,13 @@ type UrlResponse struct {
 	Sd string `json:"sd"`
 }
 type GifResponse struct {
-	Urls UrlResponse `json:"urls"`
-	Id   string      `json:"id"`
+	Urls     UrlResponse  `json:"urls"`
+	Id       string       `json:"id"`
+	CTA      *CtaResponse `json:"cta"`
+	Username string       `json:"userName"`
+}
+type CtaResponse struct {
+	ShowReason string `json:"showReason"`
 }
 type GifsResponse struct {
 	Gifs []GifResponse `json:"gifs"`
@@ -116,17 +121,28 @@ func (c *RedGifsClient) Search(tags []string) (files []api.FileToSend, err error
 	}
 	var results []api.FileToSend
 	for _, gif := range searchResp.Gifs {
-		if gif.Urls.Sd != "" {
-			results = append(results, api.FileToSend{
-				Name: "redgif_" + gif.Urls.Sd,
-				URL:  gif.Urls.Sd,
-			})
-		} else if gif.Urls.Hd != "" {
-			results = append(results, api.FileToSend{
-				Name: "redgif_" + gif.Urls.Hd,
-				URL:  gif.Urls.Hd,
-			})
+		if gif.CTA != nil {
+			continue //skip adverts
+		}
+		toFileToSend := toFileToSend(gif)
+		if toFileToSend != nil {
+			results = append(results, *toFileToSend)
 		}
 	}
 	return results, nil
+}
+
+func toFileToSend(gif GifResponse) *api.FileToSend {
+	url := gif.Urls.Sd
+	if url == "" {
+		url = gif.Urls.Hd
+	}
+	if url == "" {
+		return nil
+	}
+	return &api.FileToSend{
+		Name:     "redgif_" + gif.Id,
+		URL:      url,
+		Username: gif.Username,
+	}
 }

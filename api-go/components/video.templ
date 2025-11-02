@@ -1,0 +1,15 @@
+package components
+
+import "kannonfoundry/api-go/api"
+
+templ Video(files []api.FileToSend) {
+    <div class="row">
+    for _, file := range files {
+        <div class="col-12 col-md-4 mb-2">
+        <video class="w-100" src={file.URL} controls />
+        <a href={"/creators/" + file.Username}>{file.Username}</a>
+        </div>
+    }
+    </div>
+}
+
