@@ -132,6 +132,51 @@ func (c *RedGifsClient) Search(tags []string) (files []api.FileToSend, err error
 	return results, nil
 }
 
+func (c *RedGifsClient) SearchByUser(username string) (files []api.FileToSend, err error) {
+	if c.IsTokenExpired() {
+		if err := c.login(); err != nil {
+			return nil, fmt.Errorf("failed to login: %w", err)
+		}
+	}
+	req, err := http.NewRequest("GET", baseUrl+"/users/"+username+"/search?type=g&order=trending&count=10", nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.authToken)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("search request failed: %s", resp.Status)
+	}
+	var searchResp GifsResponse
+	if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
+		return nil, err
+	}
+	var results []api.FileToSend
+	for _, gif := range searchResp.Gifs {
+		if gif.CTA != nil {
+			continue //skip adverts
+		}
+		toFileToSend := toFileToSend(gif)
+		if toFileToSend != nil {
+			results = append(results, *toFileToSend)
+		}
+	}
+	return results, nil
+}
+
+func FormatFileUrls(files []api.FileToSend) {
+	for i, file := range files {
+		files[i].URL = strings.Replace(file.URL, "https://media.redgifs.com/", "/rgp/", 1)
+	}
+}
+
 func toFileToSend(gif GifResponse) *api.FileToSend {
 	url := gif.Urls.Sd
 	if url == "" {

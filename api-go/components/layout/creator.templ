@@ -1,0 +1,10 @@
+package layout
+
+templ Creator(username string, gifs templ.Component) {
+	<div class="container">
+		{ username }
+		<div id="search-results">
+			@gifs
+		</div>
+	</div>
+}
