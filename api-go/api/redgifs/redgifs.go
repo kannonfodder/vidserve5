@@ -99,7 +99,7 @@ func (c *RedGifsClient) Search(tags []string) (files []api.FileToSend, err error
 			return nil, fmt.Errorf("failed to login: %w", err)
 		}
 	}
-	req, err := http.NewRequest("GET", baseUrl+"/gifs/search?type=g&order=new&count=10&tags="+strings.Join(tags, "|"), nil)
+	req, err := http.NewRequest("GET", baseUrl+"/gifs/search?type=g&order=latest&count=10&tags="+strings.Join(tags, "|"), nil)
 	if err != nil {
 		return nil, err
 	}
