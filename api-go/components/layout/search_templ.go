@@ -31,7 +31,7 @@ func Search(user auth.User) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container-sm rounded-bottom bg-dark text-light position-sticky top-0 p-4 pt-1 border border-top-0 border-dark-subtle\"><div class=\"d-flex flex-row-reverse justify-content-between align-items-center\"><div class=\"user-controls \">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container-sm rounded-bottom bg-dark text-light position-sticky top-0 p-4 pt-1 border border-top-0 border-dark-subtle\" style=\"z-index: 9999;\"><div class=\"d-flex flex-row-reverse justify-content-between align-items-center gap-2\"><div class=\"user-controls \">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -59,7 +59,7 @@ func Search(user auth.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><form class=\"mb-0\"><div class=\"input-group\"><input class=\"form-control\" name=\"search\" type=\"text\" id=\"search\" placeholder=\"Search...\"> <button class=\"btn btn-primary\" type=\"submit\" hx-post=\"/search\" hx-target=\"#search-results\" hx-target=\"innerHTML\">Search</button></div></form></div></div><div class=\"container mt-4 overflow-auto\" id=\"search-results\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><form class=\"mb-0\" hx-post=\"/search\" hx-target=\"#search-results\" hx-swap=\"innerHTML\" hx-on=\"htmx:beforeRequest: document.getElementById('search').blur()\"><div class=\"input-group\"><input class=\"form-control\" name=\"search\" type=\"text\" id=\"search\" placeholder=\"Search...\"> <button class=\"btn btn-primary\" type=\"submit\">Search</button></div></form></div></div><div class=\"container mt-4 overflow-auto\" id=\"search-results\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
