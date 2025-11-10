@@ -93,13 +93,13 @@ func (c *RedGifsClient) FormatAndModifySearch(tags []string, authorID int64) (se
 	return strings.Join(tags, "|"), nil
 }
 
-func (c *RedGifsClient) Search(tags []string) (files []api.FileToSend, err error) {
+func (c *RedGifsClient) Search(tags []string, count int, page int) (files []api.FileToSend, err error) {
 	if c.IsTokenExpired() {
 		if err := c.login(); err != nil {
 			return nil, fmt.Errorf("failed to login: %w", err)
 		}
 	}
-	req, err := http.NewRequest("GET", baseUrl+"/gifs/search?type=g&order=latest&count=10&tags="+strings.Join(tags, "|"), nil)
+	req, err := http.NewRequest("GET", baseUrl+"/gifs/search?type=g&order=latest&page="+fmt.Sprint(page)+"&count="+fmt.Sprint(count)+"&tags="+strings.Join(tags, "|"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -132,13 +132,13 @@ func (c *RedGifsClient) Search(tags []string) (files []api.FileToSend, err error
 	return results, nil
 }
 
-func (c *RedGifsClient) SearchByUser(username string) (files []api.FileToSend, err error) {
+func (c *RedGifsClient) SearchByUser(username string, count int, page int) (files []api.FileToSend, err error) {
 	if c.IsTokenExpired() {
 		if err := c.login(); err != nil {
 			return nil, fmt.Errorf("failed to login: %w", err)
 		}
 	}
-	req, err := http.NewRequest("GET", baseUrl+"/users/"+username+"/search?type=g&order=new&count=10", nil)
+	req, err := http.NewRequest("GET", baseUrl+"/users/"+username+"/search?type=g&order=new&page="+fmt.Sprint(page)+"&count="+fmt.Sprint(count), nil)
 	if err != nil {
 		return nil, err
 	}

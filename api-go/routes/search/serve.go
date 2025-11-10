@@ -9,7 +9,7 @@ import (
 func Serve(w http.ResponseWriter, r *http.Request) {
 	query := r.FormValue("search")
 	redgifsapiClient := redgifs.NewClient()
-	files, err := redgifsapiClient.Search([]string{query})
+	files, err := redgifsapiClient.Search([]string{query}, 20, 1)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Error during search: " + err.Error()))

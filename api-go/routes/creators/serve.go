@@ -19,7 +19,7 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	username := vars["username"]
 
 	redgifsapiClient := redgifs.NewClient()
-	files, err := redgifsapiClient.SearchByUser(username)
+	files, err := redgifsapiClient.SearchByUser(username, 20, 1)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("Error during search: " + err.Error()))
