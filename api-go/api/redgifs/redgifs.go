@@ -103,6 +103,7 @@ func (c *RedGifsClient) Search(tags []string, count int, page int) (files []api.
 	if err != nil {
 		return nil, err
 	}
+	fmt.Printf("Searching: %s\n", req.URL.String())
 	req.Header.Set("Authorization", "Bearer "+c.authToken)
 
 	client := &http.Client{}

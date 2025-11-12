@@ -2,7 +2,7 @@ package components
 
 import "kannonfoundry/api-go/api"
 
-templ Video(files []api.FileToSend) {
+templ Video(files []api.FileToSend, more templ.Component) {
     <div class="row">
     for _, file := range files {
         <div class="col-12 col-md-4 mb-2">
@@ -11,5 +11,6 @@ templ Video(files []api.FileToSend) {
         </div>
     }
     </div>
+    @more
 }
 
