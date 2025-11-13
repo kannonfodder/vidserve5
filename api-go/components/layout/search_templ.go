@@ -59,7 +59,7 @@ func Search(user auth.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><form class=\"mb-0\" hx-post=\"/search\" hx-target=\"#search-results\" hx-swap=\"innerHTML\" hx-on=\"htmx:beforeRequest: document.getElementById('search').blur()\"><div class=\"input-group\"><input class=\"form-control\" name=\"search\" type=\"text\" id=\"search\" placeholder=\"Search...\"> <button class=\"btn btn-primary\" type=\"submit\">Search</button></div></form></div></div><div class=\"container mt-4 overflow-auto\" id=\"search-results\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><form id=\"search-form\" class=\"mb-0\" hx-post=\"/search\" hx-target=\"#search-results\" hx-swap=\"innerHTML\" hx-on=\"htmx:beforeRequest: document.getElementById('search').blur()\"><div class=\"input-group\"><input class=\"form-control\" name=\"search\" type=\"text\" id=\"search\" placeholder=\"Search...\"> <button class=\"btn btn-primary\" type=\"submit\">Search</button></div></form></div></div><div class=\"container mt-4 overflow-auto\" id=\"search-results\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

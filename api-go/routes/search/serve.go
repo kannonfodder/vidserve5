@@ -27,5 +27,5 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	components.Video(files,
-		components.More("/search", page)).Render(r.Context(), w)
+		components.More("/search", page, "search-form")).Render(r.Context(), w)
 }

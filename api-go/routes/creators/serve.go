@@ -34,10 +34,10 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	if page == 1 {
 		render(w, r,
 			layout.Creator(username, components.Video(files,
-				components.More("/creators/"+username, page))), username)
+				components.More("/creators/"+username, page, ""))), username)
 	} else {
 		components.Video(files,
-			components.More("/creators/"+username, page)).Render(r.Context(), w)
+			components.More("/creators/"+username, page, "")).Render(r.Context(), w)
 	}
 
 }

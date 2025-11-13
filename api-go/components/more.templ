@@ -1,16 +1,16 @@
 package components
 
 import "strconv"
-templ More(endpoint string, page int) {
 
+templ More(endpoint string, page int, form string) {
 	<div class="container row mb-2">
-        <div class="col-6">
-            if page > 1 {
-                <button class="btn btn-primary" hx-post={endpoint + "?page=" + strconv.Itoa(page - 1)} hx-target="#search-results" >Load Previous</button>
-            }
-        </div>
-        <div class="col-6">
-		    <button class="btn btn-primary" hx-post={endpoint + "?page=" + strconv.Itoa(page + 1)} hx-target="#search-results" >Load More</button>
-        </div>
+		<div class="col-6">
+			if page > 1 {
+				<button class="btn btn-primary" hx-post={ endpoint + "?page=" + strconv.Itoa(page-1) } hx-target="#search-results" form={ form }>Load Previous</button>
+			}
+		</div>
+		<div class="col-6">
+			<button class="btn btn-primary" hx-post={ endpoint + "?page=" + strconv.Itoa(page+1) } hx-target="#search-results" form={ form }>Load More</button>
+		</div>
 	</div>
 }

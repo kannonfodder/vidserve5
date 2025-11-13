@@ -31,7 +31,7 @@ templ Search(user auth.User) {
 					</a>
 				}
 			</div>
-			<form class="mb-0"hx-post="/search" hx-target="#search-results" hx-swap="innerHTML" hx-on="htmx:beforeRequest: document.getElementById('search').blur()">
+			<form id="search-form" class="mb-0" hx-post="/search" hx-target="#search-results" hx-swap="innerHTML" hx-on="htmx:beforeRequest: document.getElementById('search').blur()">
 				<div class="input-group">
 					<input class="form-control" name="search" type="text" id="search" placeholder="Search..."/>
 					<button class="btn btn-primary" type="submit">Search</button>
