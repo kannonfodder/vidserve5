@@ -23,6 +23,12 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redgifsapiClient := redgifs.NewClient()
+	creator, err := redgifsapiClient.GetCreator(username)
+	if err != nil {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Error fetching creator: " + err.Error()))
+		return
+	}
 	files, err := redgifsapiClient.SearchByUser(username, 20, page)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
@@ -33,7 +39,7 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 	redgifs.FormatFileUrls(files)
 	if page == 1 {
 		render(w, r,
-			layout.Creator(username, components.Video(files,
+			layout.Creator(*creator, components.Video(files,
 				components.More("/creators/"+username, page, ""))), username)
 	} else {
 		components.Video(files,

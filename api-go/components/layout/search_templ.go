@@ -31,7 +31,7 @@ func Search(user auth.User) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container-sm rounded-bottom bg-dark text-light position-sticky top-0 p-4 pt-1 border border-top-0 border-dark-subtle\" style=\"z-index: 9999;\"><div class=\"d-flex flex-row-reverse justify-content-between align-items-center gap-2\"><div class=\"user-controls \">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container-sm rounded-bottom bg-dark text-light p-4 py-2 border border-top-0 border-dark-subtle\"><div class=\"d-flex flex-row-reverse justify-content-between align-items-center gap-2\"><div class=\"user-controls \">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -59,7 +59,44 @@ func Search(user auth.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div><form id=\"search-form\" class=\"mb-0\" hx-post=\"/search\" hx-target=\"#search-results\" hx-swap=\"innerHTML\" hx-on=\"htmx:beforeRequest: document.getElementById('search').blur()\"><div class=\"input-group\"><input class=\"form-control\" name=\"search\" type=\"text\" id=\"search\" placeholder=\"Search...\"> <button class=\"btn btn-primary\" type=\"submit\">Search</button></div></form></div></div><div class=\"container mt-4 overflow-auto\" id=\"search-results\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = SearchForm().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></div><div class=\"container mt-4 overflow-auto\" id=\"search-results\"></div>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return nil
+	})
+}
+
+func SearchForm() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
+			return templ_7745c5c3_CtxErr
+		}
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var3 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var3 == nil {
+			templ_7745c5c3_Var3 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<form id=\"search-form\" class=\"mb-0\" hx-post=\"/search\" hx-target=\"#search-results\" hx-swap=\"innerHTML\" hx-on=\"htmx:beforeRequest: document.getElementById('search').blur()\"><div class=\"input-group\"><input class=\"form-control\" name=\"search\" type=\"text\" id=\"search\" placeholder=\"Search...\"> <button class=\"btn btn-primary\" type=\"submit\">Search</button></div></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

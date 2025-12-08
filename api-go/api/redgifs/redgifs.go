@@ -23,12 +23,14 @@ func NewClient() *RedGifsClient {
 }
 
 var (
-	baseUrl = "https://api.redgifs.com/v2"
+	baseUrl = "https://api.redgifs.com"
+	v1Url   = baseUrl + "/v1"
+	v2Url   = baseUrl + "/v2"
 )
 
 func (client *RedGifsClient) login() error {
 	client.authToken = "" // reset any existing token
-	resp, err := http.Get(baseUrl + "/auth/temporary")
+	resp, err := http.Get(v2Url + "/auth/temporary")
 	if err != nil {
 		return err
 	}
@@ -99,7 +101,7 @@ func (c *RedGifsClient) Search(tags []string, count int, page int) (files []api.
 			return nil, fmt.Errorf("failed to login: %w", err)
 		}
 	}
-	req, err := http.NewRequest("GET", baseUrl+"/gifs/search?type=g&order=latest&page="+fmt.Sprint(page)+"&count="+fmt.Sprint(count)+"&tags="+strings.Join(tags, "|"), nil)
+	req, err := http.NewRequest("GET", v2Url+"/gifs/search?type=g&order=latest&page="+fmt.Sprint(page)+"&count="+fmt.Sprint(count)+"&tags="+strings.Join(tags, "|"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +141,7 @@ func (c *RedGifsClient) SearchByUser(username string, count int, page int) (file
 			return nil, fmt.Errorf("failed to login: %w", err)
 		}
 	}
-	req, err := http.NewRequest("GET", baseUrl+"/users/"+username+"/search?type=g&order=new&page="+fmt.Sprint(page)+"&count="+fmt.Sprint(count), nil)
+	req, err := http.NewRequest("GET", v2Url+"/users/"+username+"/search?type=g&order=new&page="+fmt.Sprint(page)+"&count="+fmt.Sprint(count), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -191,4 +193,39 @@ func toFileToSend(gif GifResponse) *api.FileToSend {
 		URL:      url,
 		Username: gif.Username,
 	}
+}
+
+type CreatorResponse struct {
+	Username        string `json:"userName"`
+	Description     string `json:"description"`
+	ProfileImageUrl string `json:"profileImageUrl"`
+}
+
+func (c *RedGifsClient) GetCreator(username string) (creator *CreatorResponse, err error) {
+	if c.IsTokenExpired() {
+		if err := c.login(); err != nil {
+			return nil, fmt.Errorf("failed to login: %w", err)
+		}
+	}
+	req, err := http.NewRequest("GET", v1Url+"/users/"+username, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", "Bearer "+c.authToken)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("search request failed: %s", resp.Status)
+	}
+	var searchResp CreatorResponse
+	if err := json.NewDecoder(resp.Body).Decode(&searchResp); err != nil {
+		return nil, err
+	}
+	return &searchResp, nil
 }

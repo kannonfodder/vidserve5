@@ -3,6 +3,8 @@ package main
 import (
 	"kannonfoundry/api-go/auth"
 	"kannonfoundry/api-go/components/layout"
+	"kannonfoundry/api-go/db"
+	"kannonfoundry/api-go/feedsvc"
 	"kannonfoundry/api-go/routes/creators"
 	"kannonfoundry/api-go/routes/login"
 	"kannonfoundry/api-go/routes/logout"
@@ -23,8 +25,18 @@ func main() {
 	if err != nil {
 		log.Println("Error loading .env file")
 	}
-	r := mux.NewRouter()
 
+	// Initialize database connection
+	dbPool, err := db.InitDB()
+	if err != nil {
+		log.Fatalf("Failed to initialize database: %v", err)
+	}
+	defer dbPool.Close()
+
+	// Start background worker for feed updates
+	go feedsvc.StartWorker(dbPool)
+
+	r := mux.NewRouter()
 	log.Println("Server started on :8080")
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

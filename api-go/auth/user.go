@@ -11,6 +11,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/google/uuid"
 )
 
 func IsLoggedIn(r *http.Request) User {
@@ -23,6 +25,7 @@ func IsLoggedIn(r *http.Request) User {
 }
 
 type User struct {
+	Id       string
 	Username string
 }
 
@@ -30,10 +33,17 @@ func (u User) IsEmpty() bool {
 	return u.Username == ""
 }
 
+func generateUserID() string {
+	return uuid.New().String()
+}
+
 func LoginUser(username, password string) string {
 	// Placeholder logic for user authentication
 	if username == "admin" && password == "password" {
-		user := User{Username: username}
+		user := User{
+			Id:       generateUserID(),
+			Username: username,
+		}
 		cookie, err := CreateUserCookie(user)
 		if err != nil {
 			return ""

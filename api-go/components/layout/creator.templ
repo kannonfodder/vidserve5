@@ -1,8 +1,10 @@
 package layout
 
-templ Creator(username string, gifs templ.Component) {
+import "kannonfoundry/api-go/api/redgifs"
+
+templ Creator(creator redgifs.CreatorResponse, gifs templ.Component) {
 	<div class="container">
-		{ username }
+		{ creator.Username }
 		<div id="search-results">
 			@gifs
 		</div>
