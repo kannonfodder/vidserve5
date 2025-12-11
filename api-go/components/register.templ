@@ -1,0 +1,35 @@
+package components
+
+templ Register(err bool, errMsg string) {
+	<div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+		<div class="card shadow-lg" style="width: 100%; max-width: 400px;">
+			<div class="card-body p-4">
+				<h2 class="card-title text-center mb-4">Register</h2>
+				<form action="/register" method="POST">
+					<div class="mb-3">
+						<label class="form-label" for="username">Username</label>
+						<input class="form-control" type="text" id="username" name="username" required/>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="password">Password</label>
+						<input class="form-control" type="password" id="password" name="password" required minlength="8"/>
+						<div class="form-text">Must be at least 8 characters</div>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" for="confirm_password">Confirm Password</label>
+						<input class="form-control" type="password" id="confirm_password" name="confirm_password" required minlength="8"/>
+					</div>
+					if err {
+						<div class="alert alert-danger" role="alert">
+							{ errMsg }
+						</div>
+					}
+					<div class="d-grid gap-2">
+						<button class="btn btn-primary btn-lg" type="submit">Register</button>
+						<a href="/login" class="btn btn-outline-secondary">Already have an account? Login</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+}

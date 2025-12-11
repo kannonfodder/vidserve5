@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func IsLoggedIn(r *http.Request) User {
@@ -33,24 +33,19 @@ func (u User) IsEmpty() bool {
 	return u.Username == ""
 }
 
-func generateUserID() string {
-	return uuid.New().String()
-}
-
-func LoginUser(username, password string) string {
-	// Placeholder logic for user authentication
-	if username == "admin" && password == "password" {
-		user := User{
-			Id:       generateUserID(),
-			Username: username,
-		}
-		cookie, err := CreateUserCookie(user)
-		if err != nil {
-			return ""
-		}
-		return cookie
+// LoginUserWithDB authenticates a user against the database
+func LoginUserWithDB(db *pgxpool.Pool, username, password string) (string, error) {
+	user, err := AuthenticateUser(db, username, password)
+	if err != nil {
+		return "", err
 	}
-	return ""
+
+	cookie, err := CreateUserCookie(*user)
+	if err != nil {
+		return "", fmt.Errorf("failed to create cookie: %w", err)
+	}
+
+	return cookie, nil
 }
 
 // CreateUserCookie creates an encrypted cookie string from a User object

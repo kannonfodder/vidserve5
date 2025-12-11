@@ -8,6 +8,7 @@ import (
 	"kannonfoundry/api-go/routes/creators"
 	"kannonfoundry/api-go/routes/login"
 	"kannonfoundry/api-go/routes/logout"
+	"kannonfoundry/api-go/routes/register"
 	"kannonfoundry/api-go/routes/rgp"
 	"kannonfoundry/api-go/routes/search"
 	"log"
@@ -32,6 +33,10 @@ func main() {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer dbPool.Close()
+
+	// Set database for routes that need it
+	login.SetDB(dbPool)
+	register.SetDB(dbPool)
 
 	// Start background worker for feed updates
 	go feedsvc.StartWorker(dbPool)
@@ -63,6 +68,8 @@ func main() {
 	r.HandleFunc("/creators/{username}", creators.Serve)
 	r.HandleFunc("/login", login.LoginPost).Methods("POST")
 	r.HandleFunc("/login", login.Serve).Methods("GET")
+	r.HandleFunc("/register", register.RegisterPost).Methods("POST")
+	r.HandleFunc("/register", register.Serve).Methods("GET")
 	r.HandleFunc("/logout", logout.Serve)
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		user := auth.IsLoggedIn(r)
