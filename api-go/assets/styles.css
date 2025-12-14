@@ -2,3 +2,19 @@ h1{
     font-size: 2em;
     color:blueviolet;
 }
+
+
+.btn.subscribed{
+    background:#e6ffe6;
+    border-color:#2e7d32;
+    color:#1b5e20;
+}
+
+/* Creator header layout */
+.creator-header{display:flex;justify-content:space-between;align-items:center;margin:1rem 0;}
+.creator-profile{display:flex;gap:1rem;align-items:center;}
+.creator-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #ccc;}
+.creator-username{margin:0;}
+.creator-description{margin:0.25rem 0 0;color:#999;}
+
+/*.video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;}*/

@@ -9,6 +9,7 @@ import (
 	"kannonfoundry/api-go/routes/login"
 	"kannonfoundry/api-go/routes/logout"
 	"kannonfoundry/api-go/routes/register"
+	"kannonfoundry/api-go/routes/feed"
 	"kannonfoundry/api-go/routes/rgp"
 	"kannonfoundry/api-go/routes/search"
 	"log"
@@ -37,6 +38,8 @@ func main() {
 	// Set database for routes that need it
 	login.SetDB(dbPool)
 	register.SetDB(dbPool)
+	creators.SetDB(dbPool)
+	feed.SetDB(dbPool)
 
 	// Start background worker for feed updates
 	go feedsvc.StartWorker(dbPool)
@@ -58,6 +61,11 @@ func main() {
 	r.PathPrefix("/rgp/").Handler(http.StripPrefix("/rgp/", http.HandlerFunc(rgp.Serve)))
 	r.HandleFunc("/search", search.Serve)
 	r.PathPrefix("/files/").Handler(http.StripPrefix("/files/", http.FileServer(http.Dir("files"))))
+	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	r.HandleFunc("/feed", feed.Serve)
+	r.HandleFunc("/creators/{username}/subscribe", creators.Subscribe).Methods("POST")
+	r.HandleFunc("/creators/{username}/subscribe", creators.Unsubscribe).Methods("DELETE")
+	r.HandleFunc("/creators/{username}/subscription-status", creators.SubscriptionStatus).Methods("GET")
 	srv := &http.Server{
 		Handler: r,
 		Addr:    ":8080",

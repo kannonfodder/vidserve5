@@ -1,9 +1,10 @@
 package api
 
 type FileToSend struct {
-	Name     string
-	URL      string
-	Username string
+	Name      string
+	URL       string
+	Username  string
+	CreatedAt int64
 }
 
 type MediaSearcher interface {

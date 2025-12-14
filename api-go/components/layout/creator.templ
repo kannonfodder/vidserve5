@@ -2,10 +2,49 @@ package layout
 
 import "kannonfoundry/api-go/api/redgifs"
 
-templ Creator(creator redgifs.CreatorResponse, gifs templ.Component) {
+// Creator page: shows profile header and video grid.
+// Params:
+// - creator: Redgifs creator profile data
+// - gifs: component to render creator's videos
+// - isLoggedIn: whether a user session exists
+// - isSubscribed: whether current user subscribed to this creator
+templ Creator(creator redgifs.CreatorResponse, gifs templ.Component, isLoggedIn bool, isSubscribed bool) {
 	<div class="container">
-		{ creator.Username }
-		<div id="search-results">
+		<div class="creator-header">
+			<div class="creator-profile">
+				<img src={ creator.ProfileImageUrl } alt={ creator.Username } class="creator-avatar"/>
+				<div class="creator-meta">
+					<h1 class="creator-username">{ creator.Username }</h1>
+					if creator.Description != "" {
+						<p class="creator-description">{ creator.Description }</p>
+					}
+				</div>
+			</div>
+			<div class="creator-actions">
+				if isLoggedIn {
+					if isSubscribed {
+						<button
+							id="subscribe-btn"
+							class="btn subscribed"
+							hx-delete={ "/creators/" + creator.Username + "/subscribe" }
+							hx-target="#subscribe-btn"
+							hx-swap="outerHTML"
+						>{ "Subscribed ✓" }</button>
+					} else {
+						<button
+							id="subscribe-btn"
+							class="btn"
+							hx-post={ "/creators/" + creator.Username + "/subscribe" }
+							hx-target="#subscribe-btn"
+							hx-swap="outerHTML"
+						>{ "Subscribe" }</button>
+					}
+				} else {
+					<a href="/login" class="btn">Login to subscribe</a>
+				}
+			</div>
+		</div>
+		<div id="search-results" class="video-grid">
 			@gifs
 		</div>
 	</div>

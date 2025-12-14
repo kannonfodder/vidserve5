@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -13,12 +14,17 @@ type Subscription struct {
 	UserId        string
 	Type          string // "tag" or "creator"
 	SearchTerm    string
-	LastVideoId   string
+	LastVideoId   *string
 	IsInitialized bool
 }
 
 // CreateSubscription adds a new feed subscription for a user
 func CreateSubscription(db *pgxpool.Pool, userID, subscriptionType, searchTerm string) (*Subscription, error) {
+	// Idempotent: return existing subscription if present
+	if existing, err := GetSubscriptionByUserAndTerm(db, userID, subscriptionType, searchTerm); err == nil && existing != nil {
+		return existing, nil
+	}
+
 	id := uuid.New().String()
 
 	query := `
@@ -115,4 +121,45 @@ func GetAllSubscriptions(db *pgxpool.Pool) ([]Subscription, error) {
 	}
 
 	return subscriptions, nil
+}
+
+// GetSubscriptionByUserAndTerm fetches a single subscription for a user+type+term.
+func GetSubscriptionByUserAndTerm(db *pgxpool.Pool, userID, subscriptionType, searchTerm string) (*Subscription, error) {
+	query := `
+		SELECT id, user_id, type, search_term, last_video_id, is_initialized
+		FROM feed_subscriptions
+		WHERE user_id = $1 AND type = $2 AND search_term = $3
+		LIMIT 1
+	`
+
+	var sub Subscription
+	err := db.QueryRow(context.Background(), query, userID, subscriptionType, searchTerm).Scan(
+		&sub.Id, &sub.UserId, &sub.Type, &sub.SearchTerm, &sub.LastVideoId, &sub.IsInitialized,
+	)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("failed to get subscription: %w", err)
+	}
+	return &sub, nil
+}
+
+// DeleteSubscriptionByUserAndTerm removes a subscription by user+type+term.
+func DeleteSubscriptionByUserAndTerm(db *pgxpool.Pool, userID, subscriptionType, searchTerm string) error {
+	query := `
+		DELETE FROM feed_subscriptions
+		WHERE user_id = $1 AND type = $2 AND search_term = $3
+	`
+
+	result, err := db.Exec(context.Background(), query, userID, subscriptionType, searchTerm)
+	if err != nil {
+		return fmt.Errorf("failed to delete subscription: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("subscription not found")
+	}
+
+	return nil
 }

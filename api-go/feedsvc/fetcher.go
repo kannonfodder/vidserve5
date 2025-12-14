@@ -14,6 +14,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type VideoItem struct {
+	Id        string
+	VideoId   string
+	Url       string
+	Username  string
+	Timestamp time.Time
+}
+
 // FetchAndStore fetches new videos for a subscription and stores them in the database
 func FetchAndStore(db *pgxpool.Pool, subscription *Subscription, rgClient *redgifs.RedGifsClient) error {
 	var videos []VideoItem
@@ -33,7 +41,7 @@ func FetchAndStore(db *pgxpool.Pool, subscription *Subscription, rgClient *redgi
 				return fmt.Errorf("failed to mark subscription as initialized: %w", err)
 			}
 			subscription.IsInitialized = true
-			subscription.LastVideoId = videos[0].VideoId
+			subscription.LastVideoId = &videos[0].VideoId
 		}
 	} else {
 		// Regular fetch: get new videos since last check
@@ -47,7 +55,7 @@ func FetchAndStore(db *pgxpool.Pool, subscription *Subscription, rgClient *redgi
 			if err := updateLastVideoId(db, subscription.Id, videos[0].VideoId); err != nil {
 				return fmt.Errorf("failed to update last video id: %w", err)
 			}
-			subscription.LastVideoId = videos[0].VideoId
+			subscription.LastVideoId = &videos[0].VideoId
 		}
 	}
 
@@ -60,13 +68,6 @@ func FetchAndStore(db *pgxpool.Pool, subscription *Subscription, rgClient *redgi
 	}
 
 	return nil
-}
-
-type VideoItem struct {
-	VideoId   string
-	Url       string
-	Username  string
-	Timestamp time.Time
 }
 
 // fetchInitialVideos gets the first 20 videos for a new subscription
@@ -121,7 +122,7 @@ func fetchNewVideos(subscription *Subscription, rgClient *redgifs.RedGifsClient)
 			videoId := file.Name
 
 			// Stop if we've reached the last seen video
-			if videoId == subscription.LastVideoId {
+			if subscription.LastVideoId != nil && videoId == *subscription.LastVideoId {
 				return allVideos, nil
 			}
 
@@ -129,7 +130,7 @@ func fetchNewVideos(subscription *Subscription, rgClient *redgifs.RedGifsClient)
 				VideoId:   videoId,
 				Url:       file.URL,
 				Username:  file.Username,
-				Timestamp: time.Now(),
+				Timestamp: time.Unix(file.CreatedAt, 0),
 			})
 		}
 
@@ -147,7 +148,7 @@ func apiFilesToVideoItems(files []api.FileToSend) []VideoItem {
 			VideoId:   file.Name,
 			Url:       file.URL,
 			Username:  file.Username,
-			Timestamp: time.Now(),
+			Timestamp: time.Unix(file.CreatedAt, 0),
 		})
 	}
 	return videos

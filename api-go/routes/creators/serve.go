@@ -2,8 +2,10 @@ package creators
 
 import (
 	"kannonfoundry/api-go/api/redgifs"
+	"kannonfoundry/api-go/auth"
 	"kannonfoundry/api-go/components"
 	"kannonfoundry/api-go/components/layout"
+	"kannonfoundry/api-go/feedsvc"
 	"net/http"
 	"strconv"
 
@@ -29,6 +31,8 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error fetching creator: " + err.Error()))
 		return
 	}
+	// Proxy the profile image URL to avoid external 403s
+	creator.ProfileImageUrl = redgifs.ProxyURL(creator.ProfileImageUrl)
 	files, err := redgifsapiClient.SearchByUser(username, 20, page)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
@@ -36,11 +40,21 @@ func Serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Auth + subscription state
+	user := auth.IsLoggedIn(r)
+	isLoggedIn := !user.IsEmpty()
+	isSubscribed := false
+	if isLoggedIn && dbPool != nil {
+		if sub, err := feedsvc.GetSubscriptionByUserAndTerm(dbPool, user.Id, "creator", username); err == nil && sub != nil {
+			isSubscribed = true
+		}
+	}
+
 	redgifs.FormatFileUrls(files)
 	if page == 1 {
 		render(w, r,
 			layout.Creator(*creator, components.Video(files,
-				components.More("/creators/"+username, page, ""))), username)
+				components.More("/creators/"+username, page, "")), isLoggedIn, isSubscribed), username)
 	} else {
 		components.Video(files,
 			components.More("/creators/"+username, page, "")).Render(r.Context(), w)

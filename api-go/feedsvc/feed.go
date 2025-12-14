@@ -7,16 +7,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type FeedItem struct {
-	Id        string
-	VideoId   string
-	Url       string
-	Username  string
-	Timestamp string
-}
-
 // GetUserFeed retrieves paginated feed items for a user
-func GetUserFeed(db *pgxpool.Pool, userID string, limit, offset int) ([]FeedItem, error) {
+func GetUserFeed(db *pgxpool.Pool, userID string, limit, offset int) ([]VideoItem, error) {
 	query := `
 		SELECT id, video_id, url, username, timestamp
 		FROM feed_items
@@ -31,9 +23,9 @@ func GetUserFeed(db *pgxpool.Pool, userID string, limit, offset int) ([]FeedItem
 	}
 	defer rows.Close()
 
-	var items []FeedItem
+	var items []VideoItem
 	for rows.Next() {
-		var item FeedItem
+		var item VideoItem
 		err := rows.Scan(&item.Id, &item.VideoId, &item.Url, &item.Username, &item.Timestamp)
 		if err != nil {
 			return nil, fmt.Errorf("failed to scan feed item: %w", err)

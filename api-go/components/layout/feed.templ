@@ -1,0 +1,13 @@
+package layout
+
+import "kannonfoundry/api-go/auth"
+
+// Feed page wrapper with results container for HTMX swaps.
+templ Feed(user auth.User, content templ.Component) {
+	<div class="container">
+		<h1>Feed</h1>
+		<div id="search-results">
+			@content
+		</div>
+	</div>
+}

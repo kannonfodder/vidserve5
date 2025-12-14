@@ -79,10 +79,11 @@ type UrlResponse struct {
 	Sd string `json:"sd"`
 }
 type GifResponse struct {
-	Urls     UrlResponse  `json:"urls"`
-	Id       string       `json:"id"`
-	CTA      *CtaResponse `json:"cta"`
-	Username string       `json:"userName"`
+	Urls      UrlResponse  `json:"urls"`
+	Id        string       `json:"id"`
+	CTA       *CtaResponse `json:"cta"`
+	Username  string       `json:"userName"`
+	CreatedAt int64        `json:"createDate"`
 }
 type CtaResponse struct {
 	ShowReason string `json:"showReason"`
@@ -176,8 +177,53 @@ func (c *RedGifsClient) SearchByUser(username string, count int, page int) (file
 
 func FormatFileUrls(files []api.FileToSend) {
 	for i, file := range files {
-		files[i].URL = strings.Replace(file.URL, "https://media.redgifs.com/", "/rgp/", 1)
+		files[i].URL = ProxyURL(file.URL)
 	}
+}
+
+// ProxyURL rewrites known Redgifs hosts to local /rgp/ proxy
+// Uses query parameter ?h={host} to specify which Redgifs subdomain to use
+func ProxyURL(u string) string {
+	if u == "" {
+		return u
+	}
+	// Determine which host this URL is from and extract path
+	host := "media" // default
+	var pathPortion string
+
+	if strings.Contains(u, "thumbs.redgifs.com/") {
+		host = "thumbs"
+		parts := strings.Split(u, "thumbs.redgifs.com/")
+		if len(parts) > 1 {
+			pathPortion = parts[1]
+		}
+	} else if strings.Contains(u, "userpic.redgifs.com/") {
+		host = "userpic"
+		parts := strings.Split(u, "userpic.redgifs.com/")
+		if len(parts) > 1 {
+			pathPortion = parts[1]
+		}
+	} else if strings.Contains(u, "i.redgifs.com/") {
+		host = "i"
+		parts := strings.Split(u, "i.redgifs.com/")
+		if len(parts) > 1 {
+			pathPortion = parts[1]
+		}
+	} else if strings.Contains(u, "media.redgifs.com/") {
+		host = "media"
+		parts := strings.Split(u, "media.redgifs.com/")
+		if len(parts) > 1 {
+			pathPortion = parts[1]
+		}
+	} else {
+		return u // not a redgifs URL
+	}
+
+	// Return /rgp/{path}?h={host}
+	if pathPortion == "" {
+		return "/rgp/?h=" + host
+	}
+	return "/rgp/" + pathPortion + "?h=" + host
 }
 
 func toFileToSend(gif GifResponse) *api.FileToSend {
@@ -189,9 +235,10 @@ func toFileToSend(gif GifResponse) *api.FileToSend {
 		return nil
 	}
 	return &api.FileToSend{
-		Name:     "redgif_" + gif.Id,
-		URL:      url,
-		Username: gif.Username,
+		Name:      "redgif_" + gif.Id,
+		URL:       url,
+		Username:  gif.Username,
+		CreatedAt: gif.CreatedAt,
 	}
 }
 
